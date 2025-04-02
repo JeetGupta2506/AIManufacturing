@@ -56,12 +56,14 @@ with st.sidebar:
     units_sold = st.number_input("📉 Units Sold", min_value=0)
     units_ordered = st.number_input("📦 Units Ordered", min_value=0)
     weather = st.selectbox("🌦️ Weather Condition", ["Sunny", "Rainy", "Snowy", "Cloudy"])
-    competitor_price = st.number_input("🏷️ Competitor Pricing", min_value=0.0, format="%.2f")
+    competitor_price = st.number_input("🏷️ Competitor Pricing", min_value=0)
     seasonality = st.selectbox("📅 Seasonality", ["Spring", "Summer", "Autumn", "Winter"])
 
 # Fetch price from dataset based on store_id and product_id
-    price_row = df_prices[(df_prices["Store ID"] == store_id) & (df_prices["Product ID"] == product_id)]
-    price = price_row["Price"].values[0] if not price_row.empty else 0.0   
+    product_row = df_prices[(df_prices["Store ID"] == store_id) & (df_prices["Product ID"] == product_id)]
+    
+    price = product_row["Price"].values[0] if not product_row.empty else 0.0
+    base_cost = product_row["Base Cost"].values[0] if not product_row.empty else 0.0
 
 # Predict Button
 st.markdown("---")  # Adds a separator for better UI
@@ -90,21 +92,38 @@ if st.button("🚀 Predict", help="Click to get demand & discount predictions", 
             # Predictions
             predicted_demand = demand_model.predict(data_preprocessed)[0]
             predicted_discount = discount_model.predict(data_preprocessed)[0]
+            discounted_price = price * (1 - predicted_discount / 100)
+            Profit = discounted_price - base_cost
 
             # Display Results in Columns
-            col1, col2 , col3= st.columns(3)
+            # First Row with Proper Spacing
+            col1, col2, col3 = st.columns([1, 1, 1])
 
             with col1:
-              st.markdown(f"""<div style="border-radius: 10px; background-color: #dff0d8; padding: 10px; text-align: center;">
-              <b style="color: #155724; font-size: 22px;">💰 ORIGINAL MRP: {price} INR</b> </div> """, unsafe_allow_html=True) 
+              st.markdown(f"""<div style="border-radius: 10px; background-color: #dff0d8; padding: 15px; margin: 5px; text-align: center;">
+             <b style="color: #155724; font-size: 22px;">💰 ORIGINAL MRP: {price} INR</b> </div> """, unsafe_allow_html=True)
 
             with col2:
-             st.markdown(f""" <div style="border-radius: 10px; background-color: #dff0d8; padding: 10px; text-align: center;">
+             st.markdown(f""" <div style="border-radius: 10px; background-color: #dff0d8; padding: 15px; margin: 5px; text-align: center;">
              <b style="color: #155724; font-size: 22px;">📊 Predicted Demand: {predicted_demand:.2f}</b></div>""", unsafe_allow_html=True)
-           
+
             with col3:
-             st.markdown(f"""<div style="border-radius: 10px; background-color: #dff0d8; padding: 10px; text-align: center;">
-             <b style="color: #155724; font-size: 22px;">🏷️ Predicted Discount: {predicted_discount:.2f}%</b> </div> """, unsafe_allow_html=True)
+             st.markdown(f"""<div style="border-radius: 10px; background-color: #dff0d8; padding: 15px; margin: 5px; text-align: center;">
+             <b style="color: #155724; font-size: 22px;">📉 Predicted Discount: {predicted_discount:.2f}%</b> </div> """, unsafe_allow_html=True)
+
+# Add some spacing between rows
+            st.markdown("<br>", unsafe_allow_html=True)
+
+# Second Row with Proper Spacing
+            col4, col5 = st.columns([1, 1])
+
+            with col4:
+             st.markdown(f"""<div style="border-radius: 10px; background-color: #dff0d8; padding: 15px; margin: 5px; text-align: center;">
+             <b style="color: #155724; font-size: 22px;">🏷️ Discounted Price: {discounted_price:.2f} INR</b> </div> """, unsafe_allow_html=True)
+
+            with col5:
+             st.markdown(f"""<div style="border-radius: 10px; background-color: #dff0d8; padding: 15px; margin: 5px; text-align: center;">
+             <b style="color: #155724; font-size: 22px;">💵 Profit: {Profit:.2f} INR</b> </div> """, unsafe_allow_html=True)
 
         except Exception as e:
             st.markdown(f"""<div style="border-radius: 10px; background-color: #f8d7da; padding: 10px; text-align: center;">
