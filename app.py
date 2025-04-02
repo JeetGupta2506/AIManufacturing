@@ -86,14 +86,20 @@ if st.button("🚀 Predict", help="Click to get demand & discount predictions", 
             predicted_discount = discount_model.predict(data_preprocessed)[0]
 
             # Display Results in Columns
-            col1, col2 = st.columns(2)
+            col1, col2 , col3= st.columns(3)
+
             with col1:
+              st.markdown(f"""<div style="border-radius: 10px; background-color: #dff0d8; padding: 10px; text-align: center;">
+              <b style="color: #155724; font-size: 22px;">💰 ORIGINAL MRP: {price} INR</b> </div> """, unsafe_allow_html=True) 
+
+            with col2:
              st.markdown(f""" <div style="border-radius: 10px; background-color: #dff0d8; padding: 10px; text-align: center;">
              <b style="color: #155724; font-size: 22px;">📊 Predicted Demand: {predicted_demand:.2f}</b></div>""", unsafe_allow_html=True)
            
-            with col2:
+            with col3:
              st.markdown(f"""<div style="border-radius: 10px; background-color: #dff0d8; padding: 10px; text-align: center;">
              <b style="color: #155724; font-size: 22px;">💰 Predicted Discount: {predicted_discount:.2f}%</b> </div> """, unsafe_allow_html=True)
+
         except Exception as e:
             st.markdown(f"""<div style="border-radius: 10px; background-color: #f8d7da; padding: 10px; text-align: center;">
             <b style="color: #721c24; font-size: 20px;">❌ Error: {str(e)}</b></div> """, unsafe_allow_html=True)
