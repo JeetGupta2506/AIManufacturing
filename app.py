@@ -44,6 +44,9 @@ st.title("📈 Dynamic Pricing Prediction")
 st.markdown("<p style='font-size:25px; font-weight:bold; color:#007BFF;'>✅ Optimize Pricing with AI-powered Predictions</p>", unsafe_allow_html=True)
 st.write("Enter product details below to get **demand & discount** predictions.")
 
+# Load the dataset 
+df_prices = pd.read_csv("retail_store_inventory.csv") 
+
 # Sidebar for User Input
 with st.sidebar:
     st.header("🔍 Enter Product Details")
@@ -52,10 +55,13 @@ with st.sidebar:
     inventory = st.number_input("📊 Inventory Level", min_value=0)
     units_sold = st.number_input("📉 Units Sold", min_value=0)
     units_ordered = st.number_input("📦 Units Ordered", min_value=0)
-    price = st.number_input("💰 Price", min_value=0.0, format="%.2f")
     weather = st.selectbox("🌦️ Weather Condition", ["Sunny", "Rainy", "Snowy", "Cloudy"])
     competitor_price = st.number_input("🏷️ Competitor Pricing", min_value=0.0, format="%.2f")
     seasonality = st.selectbox("📅 Seasonality", ["Spring", "Summer", "Autumn", "Winter"])
+
+# Fetch price from dataset based on store_id and product_id
+    price_row = df_prices[(df_prices["Store ID"] == store_id) & (df_prices["Product ID"] == product_id)]
+    price = price_row["Price"].values[0] if not price_row.empty else 0.0   
 
 # Predict Button
 st.markdown("---")  # Adds a separator for better UI
@@ -98,7 +104,7 @@ if st.button("🚀 Predict", help="Click to get demand & discount predictions", 
            
             with col3:
              st.markdown(f"""<div style="border-radius: 10px; background-color: #dff0d8; padding: 10px; text-align: center;">
-             <b style="color: #155724; font-size: 22px;">💰 Predicted Discount: {predicted_discount:.2f}%</b> </div> """, unsafe_allow_html=True)
+             <b style="color: #155724; font-size: 22px;">🏷️ Predicted Discount: {predicted_discount:.2f}%</b> </div> """, unsafe_allow_html=True)
 
         except Exception as e:
             st.markdown(f"""<div style="border-radius: 10px; background-color: #f8d7da; padding: 10px; text-align: center;">
